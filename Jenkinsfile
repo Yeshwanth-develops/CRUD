@@ -1,72 +1,51 @@
 pipeline {
-    agent {
-        docker {
-            image 'maven:3.9.6-eclipse-temurin-17'
-            args '-v /root/.m2:/root/.m2'
-        }
+    agent any
+
+    tools {
+        maven 'Maven_3.9'  // Ensure this name matches Jenkins tool config
+        jdk 'Java_17'      // Ensure this name matches Jenkins tool config
     }
 
     environment {
-        APP_NAME = 'springboot-crud-app'
-        IMAGE_NAME = "yeshwanthdevelops/${APP_NAME}"
+        APP_NAME = "SpringBoot-CRUD"
     }
 
     stages {
         stage('Checkout') {
             steps {
-                echo '📦 Checking out code from GitHub...'
-                checkout scm
+                echo "📦 Checking out code from GitHub..."
+                git branch: 'main', url: 'https://github.com/Yeshwanth-develops/CRUD.git'
             }
         }
 
         stage('Build') {
             steps {
-                echo '⚙️ Building Spring Boot application using Maven...'
-                sh 'mvn clean package -DskipTests'
+                echo "🔧 Building project with Maven..."
+                bat 'mvn clean package -DskipTests'
             }
         }
 
         stage('Test') {
             steps {
-                echo '🧪 Running tests...'
-                sh 'mvn test'
-            }
-        }
-
-        stage('Build Docker Image') {
-            steps {
-                echo '🐳 Building Docker image...'
-                sh "docker build -t ${IMAGE_NAME}:${BUILD_NUMBER} ."
-            }
-        }
-
-        stage('Push Docker Image') {
-            steps {
-                echo '🚀 Pushing Docker image to Docker Hub...'
-                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                    sh '''
-                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
-                        docker push ${IMAGE_NAME}:${BUILD_NUMBER}
-                    '''
-                }
+                echo "🧪 Running tests..."
+                bat 'mvn test'
             }
         }
 
         stage('Deploy') {
             steps {
-                echo "🚀 Deploying ${IMAGE_NAME}:${BUILD_NUMBER} ..."
-                // Example deployment step placeholder:
-                // sh 'docker run -d -p 8080:8080 ${IMAGE_NAME}:${BUILD_NUMBER}'
+                echo "🚀 Starting the Spring Boot application..."
+                bat 'start java -jar target\\*.jar'
             }
         }
     }
 
     post {
         success {
-            echo "✅ Build #${BUILD_NUMBER} completed successfully!"
+            echo "✅ Build and deployment successful!"
         }
         failure {
-            echo "❌ Build #${BUILD_NUMBER} failed. Check the logs for details."
+            echo "❌ Build failed. Please check logs."
         }
     }
 }
