@@ -21,21 +21,25 @@ pipeline {
         stage('Build') {
             steps {
                 echo "🔧 Building project with Maven..."
-                bat 'mvn clean package -DskipTests'
+                sh 'mvn clean package -DskipTests'
             }
         }
 
         stage('Test') {
             steps {
                 echo "🧪 Running tests..."
-                bat 'mvn test'
+                sh 'mvn test'
             }
         }
 
         stage('Deploy') {
             steps {
-                echo "🚀 Starting the Spring Boot application..."
-                bat 'start java -jar target\\*.jar'
+                echo "🚀 Deploying the Spring Boot JAR..."
+                sh '''
+                JAR_FILE=$(ls target/*.jar | head -n 1)
+                echo "Running $JAR_FILE..."
+                nohup java -jar $JAR_FILE > app.log 2>&1 &
+                '''
             }
         }
     }
