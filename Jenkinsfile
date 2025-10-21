@@ -16,10 +16,10 @@ pipeline {
          steps {
             script {
                 echo "Building Docker image"
-                withCredentials([usernamePassword(credentialsId: 'dockerhub-id', usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'PASSWORD')]) {
-                    sh 'docker build -t myapp:latest .'
-                    sh 'echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin'
-                    sh 'docker push mydockerhubuser/myapp:latest'
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-id', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                    sh 'docker build -t Yeshwanth-develops/CRUD:latest .'
+                    sh "echo $PASSWORD | docker login -u $USERNAME --password-stdin"
+                    sh 'docker push Yeshwanth-develops/CRUD:latest'
                 }
             }
         }
