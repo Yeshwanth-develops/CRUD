@@ -1,10 +1,10 @@
 pipeline {
     agent any 
     tools {
-        maven : 'jenkins_maven'
+        maven 'jenkins_maven'
     }
     stages {
-        stage ("build jar") {
+        stage("build jar") {
             steps {
                 script {
                     echo "Building the application"
